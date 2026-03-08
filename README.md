@@ -3,7 +3,9 @@
 Silakan deploy repository ini melalui Compute Engine. Repository ini merupakan sebuah implementasi Front-end sederhana dari praktik Back-end yang telah kita lakukan pada pertemuan 2 dan 3. Untuk Back-end **TIDAK PERLU** ikut di-deploy ke VM, cukup dijalankan secara local.
 
 File Back-end dapat di-download melalui link ini:
+```
 git clone --branch pert2_sequelize https://github.com/Simad9/praktikum_tcc_2025-2026
+```
 
 Sebelum mengikuti langkah-langkah di bawah, **pastikan teman-teman telah menjalankan server Back-End secara lokal terlebih dahulu**. Untuk caranya silakan ikuti instruksi yg terdapat pada README link di atas.
 
