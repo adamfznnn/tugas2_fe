@@ -1,6 +1,6 @@
 let port = 3000;
 
-const getApiBase = () => `http://localhost:${port}/api/v1/users`;
+const getApiBase = () => `http://localhost:${port}/api/v1/notes`;
 
 document.addEventListener("DOMContentLoaded", () => {
   const inputPort = prompt(
@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     port = inputPort.trim();
   }
 
-  getUser();
+  getNotes();
 });
 
 const formulir = document.querySelector("#user-form");
@@ -19,76 +19,81 @@ const formulir = document.querySelector("#user-form");
 formulir.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  // Tetap menggunakan ID selector lama sesuai HTML kamu
   const elemenName = document.querySelector("#name");
   const elemenEmail = document.querySelector("#email");
 
-  const username = elemenName.value.trim();
-  const email = elemenEmail.value.trim();
+  const judul = elemenName.value.trim();
+  const isi = elemenEmail.value.trim();
   const id = elemenName.dataset.id || "";
 
-  if (!username || !email) return;
+  if (!judul || !isi) return;
 
   try {
     if (id === "") {
-      await axios.post(getApiBase(), { username, email });
+      // Create Note
+      await axios.post(getApiBase(), { judul, isi });
     } else {
-      await axios.put(`${getApiBase()}/${id}`, { username, email });
+      // Update Note
+      await axios.put(`${getApiBase()}/${id}`, { judul, isi });
     }
 
     elemenName.dataset.id = "";
     elemenName.value = "";
     elemenEmail.value = "";
 
-    getUser();
+    getNotes();
   } catch (error) {
     console.log(error.response?.data || error.message);
   }
 });
 
-async function getUser() {
+async function getNotes() {
   try {
     const response = await axios.get(getApiBase());
-    const users = response.data?.data || [];
+    // Struktur response Sequelize: response.data.data
+    const notes = response.data?.data || [];
 
     const table = document.querySelector("#table-user");
     let tampilan = "";
     let no = 1;
 
-    for (const user of users) {
-      tampilan += tampilkanUser(no, user);
+    for (const note of notes) {
+      tampilan += tampilkanNote(no, note);
       no++;
     }
 
     table.innerHTML = tampilan;
-    hapusUser();
-    editUser();
+    hapusNote();
+    editNote();
   } catch (error) {
     console.log(error.response?.data || error.message);
   }
 }
 
-function tampilkanUser(no, user) {
+function tampilkanNote(no, note) {
   return `
     <tr>
       <td>${no}</td>
-      <td class="name">${user.username ?? "-"}</td>
-      <td class="email">${user.email ?? "-"}</td>
-      <td><button data-id="${user.id}" class="btn-edit" type="button">Edit</button></td>
-      <td><button data-id="${user.id}" class="btn-hapus" type="button">Hapus</button></td>
+      <td class="name">${note.judul ?? "-"}</td>
+      <td class="email">${note.isi ?? "-"}</td>
+      <td><button data-id="${note.id}" class="btn-edit" type="button">Edit</button></td>
+      <td><button data-id="${note.id}" class="btn-hapus" type="button">Hapus</button></td>
     </tr>
   `;
 }
 
-function hapusUser() {
+function hapusNote() {
   const tombolHapus = document.querySelectorAll(".btn-hapus");
 
   tombolHapus.forEach((btn) => {
     btn.addEventListener("click", async () => {
       const id = btn.dataset.id;
+      if (!confirm("Hapus catatan ini?")) return;
 
       try {
         await axios.delete(`${getApiBase()}/${id}`);
-        getUser();
+        getNotes();
       } catch (error) {
         console.log(error.response?.data || error.message);
       }
@@ -96,22 +101,22 @@ function hapusUser() {
   });
 }
 
-function editUser() {
+function editNote() {
   const tombolEdit = document.querySelectorAll(".btn-edit");
 
   tombolEdit.forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = btn.dataset.id;
       const row = btn.closest("tr");
-      const name = row.querySelector(".name").innerText;
-      const email = row.querySelector(".email").innerText;
+      const judul = row.querySelector(".name").innerText;
+      const isi = row.querySelector(".email").innerText;
 
       const elemenName = document.querySelector("#name");
       const elemenEmail = document.querySelector("#email");
 
       elemenName.dataset.id = id;
-      elemenName.value = name;
-      elemenEmail.value = email;
+      elemenName.value = judul;
+      elemenEmail.value = isi;
     });
   });
 }

@@ -1,94 +1,242 @@
 <!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Data User</title>
-    <style>
-      body {
-        font-family: sans-serif;
-        margin: 24px;
-      }
 
-      form {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-        align-items: end;
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes App</title>
+  
+  <!-- Add Google Font "Inter" for a modern look -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-      label {
-        display: block;
-        margin-bottom: 4px;
-      }
+  <style>
+    :root {
+      --primary: #4F46E5;
+      --primary-hover: #4338CA;
+      --bg: #F3F4F6;
+      --card-bg: #FFFFFF;
+      --text-main: #111827;
+      --text-muted: #6B7280;
+      --border: #E5E7EB;
+      --danger: #EF4444;
+      --warning: #F59E0B;
+    }
 
-      input {
-        padding: 6px 8px;
-      }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-      button {
-        padding: 7px 12px;
-        cursor: pointer;
-      }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-      table {
-        margin-top: 16px;
-        border-collapse: collapse;
-        width: 100%;
-        max-width: 800px;
-      }
+    h1 {
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-align: center;
+      letter-spacing: -0.025em;
+    }
 
-      th,
-      td {
-        border: 1px solid #333;
-        padding: 8px;
-        text-align: left;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Data User</h1>
+    .container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
 
-    <form id="user-form">
-      <div>
-        <label for="name">Nama</label>
-        <input
-          id="name"
-          data-id=""
-          type="text"
-          placeholder="Masukkan nama"
-          required
-        />
-      </div>
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+    }
 
-      <div>
-        <label for="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          placeholder="Masukkan email"
-          required
-        />
-      </div>
+    label {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-main);
+    }
 
-      <button type="submit">Simpan</button>
+    input, textarea {
+      padding: 12px 16px;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      background-color: #F9FAFB;
+      color: var(--text-main);
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: #9CA3AF;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+      background-color: #fff;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: var(--primary);
+      color: white;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.4);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+
+    .table-container {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      overflow-x: auto;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: #F9FAFB;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background-color: #F9FAFB;
+    }
+
+    .action-btn {
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      margin-right: 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      margin-top: 0;
+      box-shadow: none;
+    }
+    
+    .action-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .edit {
+      background: var(--warning);
+      color: white;
+    }
+
+    .edit:hover {
+      background: #D97706;
+      box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.4);
+    }
+
+    .delete {
+      background: var(--danger);
+      color: white;
+    }
+
+    .delete:hover {
+      background: #DC2626;
+      box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.4);
+    }
+
+    td:last-child {
+      white-space: nowrap;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>Aplikasi Notes</h1>
+
+    <form id="note-form">
+
+      <input type="hidden" id="note-id">
+
+      <label for="judul">Judul</label>
+      <input id="judul" type="text" placeholder="Masukkan judul catatan" required>
+
+      <label for="isi">Isi Catatan</label>
+      <textarea id="isi" rows="4" placeholder="Masukkan isi catatan"></textarea>
+
+      <button type="submit">Simpan Catatan</button>
+
     </form>
 
-    <main>
+    <div class="table-container">
       <table>
+
         <thead>
           <tr>
-            <th>No</th>
-            <th>Nama</th>
-            <th>Email</th>
-            <th colspan="2">Opsi</th>
+            <th width="5%">No</th>
+            <th width="25%">Judul</th>
+            <th width="40%">Isi</th>
+            <th width="15%">Tanggal</th>
+            <th width="15%" colspan="2">Aksi</th>
           </tr>
         </thead>
-        <tbody id="table-user"></tbody>
-      </table>
-    </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="index.js"></script>
-  </body>
+        <tbody id="table-notes"></tbody>
+
+      </table>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="index.js"></script>
+
+</body>
+
 </html>
