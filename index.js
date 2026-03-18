@@ -1,15 +1,7 @@
-let port = 3000;
 
-const getApiBase = () => `http://localhost:${port}/api/v1/notes`;
+const API_URL = "http://136.116.226.198:3000/api/v1/notes";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const inputPort = prompt(
-    'Masukkan port Back-End\nPort default: 3000'
-  );
-
-  if (inputPort && inputPort.trim() !== "") {
-    port = inputPort.trim();
-  }
 
   getNotes();
 });
@@ -19,7 +11,6 @@ const formulir = document.querySelector("#user-form");
 formulir.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // Tetap menggunakan ID selector lama sesuai HTML kamu
   const elemenName = document.querySelector("#name");
   const elemenEmail = document.querySelector("#email");
 
@@ -31,92 +22,76 @@ formulir.addEventListener("submit", async (e) => {
 
   try {
     if (id === "") {
-      // Create Note
-      await axios.post(getApiBase(), { judul, isi });
+      // Create Note - Menggunakan API_URL yang sudah didefinisikan
+      await axios.post(API_URL, { judul, isi });
     } else {
       // Update Note
-      await axios.put(`${getApiBase()}/${id}`, { judul, isi });
+      await axios.put(`${API_URL}/${id}`, { judul, isi });
     }
 
+    // Reset Form
     elemenName.dataset.id = "";
     elemenName.value = "";
     elemenEmail.value = "";
 
-    getNotes();
+    getNotes(); // Refresh tabel
   } catch (error) {
-    console.log(error.response?.data || error.message);
+    console.error("Gagal simpan:", error.response?.data || error.message);
+    alert("Gagal menyambung ke Backend. Pastikan Firewall Port 3000 sudah dibuka!");
   }
 });
 
 async function getNotes() {
   try {
-    const response = await axios.get(getApiBase());
-    // Struktur response Sequelize: response.data.data
+    const response = await axios.get(API_URL);
     const notes = response.data?.data || [];
 
     const table = document.querySelector("#table-user");
     let tampilan = "";
     let no = 1;
 
-    for (const note of notes) {
-      tampilan += tampilkanNote(no, note);
-      no++;
-    }
+    notes.forEach(note => {
+      tampilan += `
+                <tr>
+                    <td>${no++}</td>
+                    <td class="name">${note.judul ?? "-"}</td>
+                    <td class="email">${note.isi ?? "-"}</td>
+                    <td><button data-id="${note.id}" class="btn-edit" type="button">Edit</button></td>
+                    <td><button data-id="${note.id}" class="btn-hapus" type="button">Hapus</button></td>
+                </tr>`;
+    });
 
     table.innerHTML = tampilan;
-    hapusNote();
-    editNote();
+
+    // Pasang ulang event listener setelah tabel dirender
+    inisialisasiTombol();
   } catch (error) {
-    console.log(error.response?.data || error.message);
+    console.error("Gagal ambil data:", error.message);
   }
 }
 
-function tampilkanNote(no, note) {
-  return `
-    <tr>
-      <td>${no}</td>
-      <td class="name">${note.judul ?? "-"}</td>
-      <td class="email">${note.isi ?? "-"}</td>
-      <td><button data-id="${note.id}" class="btn-edit" type="button">Edit</button></td>
-      <td><button data-id="${note.id}" class="btn-hapus" type="button">Hapus</button></td>
-    </tr>
-  `;
-}
-
-function hapusNote() {
-  const tombolHapus = document.querySelectorAll(".btn-hapus");
-
-  tombolHapus.forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const id = btn.dataset.id;
+function inisialisasiTombol() {
+  // Event Hapus
+  document.querySelectorAll(".btn-hapus").forEach((btn) => {
+    btn.onclick = async () => {
       if (!confirm("Hapus catatan ini?")) return;
-
       try {
-        await axios.delete(`${getApiBase()}/${id}`);
+        await axios.delete(`${API_URL}/${btn.dataset.id}`);
         getNotes();
-      } catch (error) {
-        console.log(error.response?.data || error.message);
-      }
-    });
+      } catch (error) { console.error(error); }
+    };
   });
-}
 
-function editNote() {
-  const tombolEdit = document.querySelectorAll(".btn-edit");
-
-  tombolEdit.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.id;
+  // Event Edit
+  document.querySelectorAll(".btn-edit").forEach((btn) => {
+    btn.onclick = () => {
       const row = btn.closest("tr");
-      const judul = row.querySelector(".name").innerText;
-      const isi = row.querySelector(".email").innerText;
-
       const elemenName = document.querySelector("#name");
       const elemenEmail = document.querySelector("#email");
 
-      elemenName.dataset.id = id;
-      elemenName.value = judul;
-      elemenEmail.value = isi;
-    });
+      elemenName.dataset.id = btn.dataset.id;
+      elemenName.value = row.querySelector(".name").innerText;
+      elemenEmail.value = row.querySelector(".email").innerText;
+    };
   });
 }
